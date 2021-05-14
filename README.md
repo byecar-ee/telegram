@@ -2,7 +2,7 @@
 
 Bot, that gives you an ability to report any invalid usage of city space in Tallinn:
 * Parking on bike road
-* Invalid urban planning
+* Parking in prohibited area
 * Car ride in prohibited area
 * Mistakes in urban planning
 
