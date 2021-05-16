@@ -1,4 +1,4 @@
-const { Telegraf, Markup, session } = require('telegraf');
+const { Telegraf, Markup } = require('telegraf');
 const { Type } = require('./type');
 const moment = require('moment');
 const { Position } = require('./position');
@@ -46,7 +46,7 @@ function locationShared(ctx) {
 }
 
 function deleteSession(ctx) {
-    if(sessions[ctx.from.id]) {
+    if (sessions[ctx.from.id]) {
         delete sessions[ctx.from.id];
         ctx.reply("Your session successfully deleted.");
     }
