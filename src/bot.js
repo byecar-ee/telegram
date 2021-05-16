@@ -1,7 +1,7 @@
-const { Telegraf, Markup } = require('telegraf');
-const { Type } = require('./type');
+const {Telegraf, Markup } = require('telegraf');
+const {Type} = require('./type');
 const moment = require('moment');
-const { Position } = require('./position');
+const {Position} = require('./position');
 
 const sessions = {};
 
@@ -36,13 +36,29 @@ function locationShared(ctx) {
     }
     new Position(ctx.message.location).parse().then((position) => {
         if (position.locality === "Tallinn") {
-            ctx.reply(`Yes, you are right now in Tallinn.\nYour approximately location: ${position.street} ${position.number}.\nPlace share photo/video of incident.\nKeep in mind, that vehicle registration plate should be visible.`);
+            sessions[ctx.from.id].incident.stage = 'media_sending';
+            ctx.reply(`Yes, you are right now in Tallinn.\nYour approximately location: ${position.street} ${position.number}.\nPlace share photo/video of ${sessions[ctx.from.id].incident.type} incident. ${sessions[ctx.from.id].incident.type !== Type['PLANNING_MISTAKES'] ? '\nKeep in mind, that vehicle registration plate should be visible.' : ''}`, Markup.inlineKeyboard([
+                Markup.button.callback("It's invalid location.", 'FIX_POSITION')
+            ]));
         } else {
-            ctx.reply("Sorry, but currently our bot is available only in Tallinn. Drop your session or try again.", Markup.inlineKeyboard([
+            ctx.reply("Sorry, but currently our bot is available only in Tallinn. " +
+                "Drop your session or try again.", Markup.inlineKeyboard([
                 Markup.button.callback("Drop my session", 'END')
             ]));
         }
     })
+}
+
+function mediaShared(ctx) {
+
+}
+
+function fixData(ctx, type) {
+    switch (type) {
+        case "POSITION":
+            sessions[ctx.from.id].incident.stage = 'media_sending'
+            ctx.reply("Try again to send location of incident.")
+    }
 }
 
 function deleteSession(ctx) {
@@ -61,6 +77,7 @@ class Bot {
         this.bot.action('PARKING_PROHIBITED', (ctx) => reportTypeSelected(ctx, Type['PARKING_PROHIBITED']));
         this.bot.action('RIDE_PROHIBITED', (ctx) => reportTypeSelected(ctx, Type['RIDE_PROHIBITED']));
         this.bot.action('PLANNING_MISTAKES', (ctx) => reportTypeSelected(ctx, Type['PLANNING_MISTAKES']));
+        this.bot.action('FIX_POSITION', (ctx) => fixData(ctx, 'POSITION'))
         this.bot.action('END', (ctx) => deleteSession(ctx));
         this.bot.on('location', (ctx) => locationShared(ctx));
     }
@@ -69,9 +86,9 @@ class Bot {
         this.bot.launch().then(() => {
             console.log("Bot successfully started.")
             if (this.bot.botInfo.last_name) {
-                console.log(`Logged in as ${this.bot.botInfo.first_name} ${this.bot.botInfo.last_name}.`)
+                console.log(`Logged in as ${this.bot.botInfo.first_name} ${this.bot.botInfo.last_name} (@${this.bot.botInfo.username}).`)
             } else {
-                console.log(`Logged in as ${this.bot.botInfo.first_name}.`)
+                console.log(`Logged in as ${this.bot.botInfo.first_name} (@${this.bot.botInfo.username}).`)
             }
         });
     }
