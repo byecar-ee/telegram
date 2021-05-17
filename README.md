@@ -13,5 +13,5 @@ At nowadays this is at development, but you can help with it.
     1. You send your position.
     2. You send photo of incident.
     3. You send number of car, that violates the rules.
-    4. You should to write your real name.
-3. **Does you collect any data?** Yes, we collect **unpersonalized** data.
+    4. You should write your real name.
+3. **Do you collect any data?** Yes, we collect **unpersonalized** data.
